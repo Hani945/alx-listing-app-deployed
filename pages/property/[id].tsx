@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import PropertyDetail from "@/components/property/PropertyDetail";
 import { PropertyProps } from "@/interfaces";
-import api from "@/services/api"; // ✅ Use centralized API instance
+import api from "@/services/api";
 
 export default function PropertyDetailPage() {
   const router = useRouter();
@@ -17,8 +17,7 @@ export default function PropertyDetailPage() {
 
       try {
         setLoading(true);
-        // ✅ Use environment variable base URL via api.ts
-        const response = await api.get(`/properties/${id}`);
+        const response = await api.get<PropertyProps>(`/properties/${id}`);
         setProperty(response.data);
         setError(null);
       } catch (err) {
@@ -32,43 +31,9 @@ export default function PropertyDetailPage() {
     fetchProperty();
   }, [id]);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="max-w-6xl mx-auto p-4">
-        <div
-          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
-          role="alert"
-        >
-          <strong className="font-bold">Error: </strong>
-          <span className="block sm:inline">{error}</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (!property) {
-    return (
-      <div className="max-w-6xl mx-auto p-4">
-        <div
-          className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative"
-          role="alert"
-        >
-          <strong className="font-bold">Not Found: </strong>
-          <span className="block sm:inline">
-            The requested property could not be found.
-          </span>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <p className="text-center text-gray-500">Loading...</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
+  if (!property) return <p className="text-yellow-500">Property not found</p>;
 
   return <PropertyDetail property={property} />;
 }

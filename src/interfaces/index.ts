@@ -18,7 +18,7 @@ export interface PropertyProps {
   price: number;
   offers: Offers;
   image: string;
-  discount?: string; // optional, percent as string (e.g. "20")
+  discount?: string;
 }
 
 export default PropertyProps;

@@ -1,25 +1,16 @@
 import { useEffect, useState } from "react";
 import PropertyCard from "@/components/common/PropertyCard";
-import api from "@/services/api"; // ✅ Use centralized API instance
-
-interface Property {
-  id: string;
-  title: string;
-  location: string;
-  price: number;
-  image: string;
-  [key: string]: any; // for any extra fields
-}
+import api from "@/services/api";
+import { PropertyProps } from "@/interfaces";
 
 export default function Home() {
-  const [properties, setProperties] = useState<Property[]>([]);
+  const [properties, setProperties] = useState<PropertyProps[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        // ✅ Now uses the environment base URL
-        const response = await api.get("/properties");
+        const response = await api.get<PropertyProps[]>("/properties");
         setProperties(response.data);
       } catch (error) {
         console.error("Error fetching properties:", error);
@@ -38,7 +29,7 @@ export default function Home() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
       {properties.map((property) => (
-        <PropertyCard key={property.id} property={property} />
+        <PropertyCard key={property.name} property={property} />
       ))}
     </div>
   );
