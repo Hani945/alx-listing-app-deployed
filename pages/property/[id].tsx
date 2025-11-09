@@ -1,8 +1,8 @@
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
+import axios from "axios";
 import PropertyDetail from "@/components/property/PropertyDetail";
 import { PropertyProps } from "@/interfaces";
-import api from "@/services/api";
 
 export default function PropertyDetailPage() {
   const router = useRouter();
@@ -14,10 +14,12 @@ export default function PropertyDetailPage() {
   useEffect(() => {
     const fetchProperty = async () => {
       if (!id) return;
-
+      
       try {
         setLoading(true);
-        const response = await api.get<PropertyProps>(`/properties/${id}`);
+        // Use the environment variable for the API base URL
+        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+        const response = await axios.get(`${baseUrl}/api/properties?id=${id}`);
         setProperty(response.data);
         setError(null);
       } catch (err) {
@@ -31,9 +33,35 @@ export default function PropertyDetailPage() {
     fetchProperty();
   }, [id]);
 
-  if (loading) return <p className="text-center text-gray-500">Loading...</p>;
-  if (error) return <p className="text-red-500">{error}</p>;
-  if (!property) return <p className="text-yellow-500">Property not found</p>;
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-6xl mx-auto p-4">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+          <strong className="font-bold">Error: </strong>
+          <span className="block sm:inline">{error}</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!property) {
+    return (
+      <div className="max-w-6xl mx-auto p-4">
+        <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative" role="alert">
+          <strong className="font-bold">Not Found: </strong>
+          <span className="block sm:inline">The requested property could not be found.</span>
+        </div>
+      </div>
+    );
+  }
 
   return <PropertyDetail property={property} />;
 }

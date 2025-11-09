@@ -1,6 +1,6 @@
+import axios from "axios";
 import { useEffect, useState } from "react";
 import PropertyCard from "@/components/common/PropertyCard";
-import api from "@/services/api";
 import { PropertyProps } from "@/interfaces";
 
 export default function Home() {
@@ -10,7 +10,8 @@ export default function Home() {
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        const response = await api.get<PropertyProps[]>("/properties");
+        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+        const response = await axios.get(`${baseUrl}/api/properties`);
         setProperties(response.data);
       } catch (error) {
         console.error("Error fetching properties:", error);
@@ -29,7 +30,7 @@ export default function Home() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
       {properties.map((property) => (
-        <PropertyCard key={property.name} property={property} />
+        <PropertyCard key={property.id} property={property} />
       ))}
     </div>
   );
